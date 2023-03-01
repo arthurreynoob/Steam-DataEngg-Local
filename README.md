@@ -38,5 +38,5 @@ Transformation are performed on the SteamWebstore API data using **PySpark**. Ma
 
 ## Improvements
 * Add Data visualization
-* Apply more transormations
+* Apply more transformations
 * Incorporate Cloud technology
