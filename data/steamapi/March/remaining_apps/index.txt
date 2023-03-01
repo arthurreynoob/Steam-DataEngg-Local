@@ -1,0 +1,4 @@
+23-03-01-05:13:07,data/steamapi/March/remaining_apps/remaining_apps(52047).parquet,63
+23-03-01-03:05:52,data/steamapi/March/remaining_apps/remaining_apps(54947).parquet,34
+23-03-01-02:53:02,data/steamapi/March/remaining_apps/remaining_apps(55147).parquet,32
+23-03-01-02:18:26,data/steamapi/March/remaining_apps/remaining_apps(55747).parquet,26

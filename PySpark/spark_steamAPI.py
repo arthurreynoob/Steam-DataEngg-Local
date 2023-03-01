@@ -1,12 +1,5 @@
 import sys
-import datetime as dt
-import pyspark
-from pyspark.sql import SparkSession, types, functions as F
-import pandas as pd
-from pyspark.sql import types
-
-from pyspark.sql.functions import from_json, explode, struct, col
-from pyspark.sql.types import StructType, StructField, IntegerType, StringType, ArrayType
+from pyspark.sql import SparkSession
 
 import UDF_forPyspark as UDF
 
