@@ -9,13 +9,13 @@ services:
     volumes:
       - ./apps:/opt/prefect/apps
       - ./resources:/opt/prefect/resources
-      - ./.prefect:/root/.prefect
+      - ./volumes/prefect:/root/.prefect
     tty: true
 
   postgres:
     image: postgres:13
     volumes:
-      - ./.postgres:/var/lib/postgresql/data
+      - ./volumes/postgres:/var/lib/postgresql/data
       - ./scripts/docker-postgresql-multiple-databases:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_USER: root
@@ -29,7 +29,7 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./.metabase:/metabase-data
+      - ./volumes/metabase:/metabase-data
     tty: true
     environment:
       MB_DB_TYPE: postgres
