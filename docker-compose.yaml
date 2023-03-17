@@ -15,7 +15,7 @@ services:
   postgres:
     image: postgres:13
     volumes:
-      - ./volumes/postgres:/var/lib/postgresql/data
+      - ./volumes/postgres:/var/lib/postgresql/data:rw
       - ./scripts/docker-postgresql-multiple-databases:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_USER: root

@@ -7,6 +7,7 @@ from pyspark.sql import SparkSession, types, functions as F
 from pyspark.sql.types import StructType, StructField, StringType, FloatType
 
 from prefect import task,flow
+from prefect.tasks import task_input_hash
 
 from User_Defined_Module import steamapi_start, steamspy_download_all_page
 import UDF_forPyspark as UDF
@@ -39,7 +40,7 @@ def UDF_steamAPI_start(folder ,file_name = 'steamapi'):
 
     return None
 
-@task(log_prints=True,retries=3,retry_delay_seconds=600)
+@task(log_prints=True,retries=3,retry_delay_seconds=600,cache_key_fn=task_input_hash, cache_expiration=datetime.timedelta(days=1))
 def UDF_steamSpy_start(download_folder):
     """
     FOR STEAMSPY
@@ -59,7 +60,7 @@ def initialize_spark():
     spark = SparkSession.builder \
     .master("local[*]") \
     .config("spark.driver.memory","8g") \
-    .config("spark.jars", "../../sample_resources/postgres_jar/postgresql-42.5.1.jar") \
+    .config("spark.jars", "../resources/postgres_jar/postgresql-42.5.1.jar") \
     .appName('steamAPI') \
     .getOrCreate()
 
@@ -140,8 +141,8 @@ def steamSpy_ETL(steamspy_data_folder):
 
 @flow(name="Main_SteamProject_Local")
 def Main_flow():
-    steamSpy_ETL(steamspy_data_folder ="../../sample_resources/steam_proj/data/steamSpy")
-    steamAPI_ETL(steamapi_data_folder="../../sample_resources/steam_proj/data/steamapi")
+    steamSpy_ETL(steamspy_data_folder ="../resources/data/steamSpy")
+    steamAPI_ETL(steamapi_data_folder="../resources/data/steamapi")
 
 if __name__ == '__main__':
     Main_flow()

@@ -40,3 +40,7 @@ Transformation are performed on the SteamWebstore API data using **PySpark**. Ma
 * Add Data visualization
 * Apply more transformations
 * Incorporate Cloud technology
+
+## Metabase Creds:
+* email: steam_project@gmail.com
+* password: asdfjkl;12347890

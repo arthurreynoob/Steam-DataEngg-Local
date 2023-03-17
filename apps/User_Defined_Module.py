@@ -254,7 +254,7 @@ def process_batches(app_list, directory, file_name, batchsize = 100, pause = 1, 
     app_list_pd = pd.read_parquet(app_list)
     
     app_list_pyarrow = pq.ParquetFile(app_list)
-    total_batches = math.ceil(len(app_list_pyarrow)/batchsize) 
+    total_batches = math.ceil(app_list_pyarrow.metadata.num_rows/batchsize) 
     for i,batch in enumerate(app_list_pyarrow.iter_batches(batch_size = batchsize)):
         
         print(f'Downloading batch {batch_num}, {batchsize} apps')
