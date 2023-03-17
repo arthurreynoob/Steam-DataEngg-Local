@@ -19,7 +19,7 @@ Main functions to use:
             for downloading from steam api
 """
 
-def get_steamspy_request(url,download_folder,parameters=None,page=None):
+def get_steamspy_request(url,parameters,download_folder,page=None):
     """Return json-formatted response of a get request using optional parameters.
 
     Parameters
@@ -63,10 +63,6 @@ def get_steamspy_request(url,download_folder,parameters=None,page=None):
     
     if response:
         
-        #FOR PARAMETRIZATION
-        #get the date of when data was extracted
-        # date_name = dt.datetime.today().strftime("%Y_%m_%d")
-        
         #converted to pandas dataframe, inorder to be saved to parquet
         data_pandas = pd.DataFrame.from_dict(response.json(), orient='index')
         
@@ -76,9 +72,6 @@ def get_steamspy_request(url,download_folder,parameters=None,page=None):
         #error handling with column 'score_rank', forced change datatype to str
         data_pandas['score_rank']=data_pandas['score_rank'].astype(str)
         
-        #FOR PARAMETRIZATION
-        #create the folder for the specified date
-        # directory = f'data/SteamSpy/{date_name}'
         os.makedirs(download_folder, exist_ok=True)
         
         #FOR PARAMETRIZATION
@@ -91,7 +84,7 @@ def get_steamspy_request(url,download_folder,parameters=None,page=None):
         return None
 
 
-def steamspy_download_all_page(download_folder,page_start=0,page_end=61):
+def steamspy_download_all_page(download_folder="date/steamspy",page_start=0,page_end=1000):
     """
     
     download multiple pages from the all category of steamspy
@@ -105,25 +98,31 @@ def steamspy_download_all_page(download_folder,page_start=0,page_end=61):
     23/01/18: Added default values to page_start = 0 and page_end = 61
 
     """
-    
-    start_time = time.time()
 
     #steam spy url
     url = "https://steamspy.com/api.php"
     
+    none_counter = 0
     for page in range(page_start,page_end+1):
         
         params = {'request':'all','page':page}
-        data = get_steamspy_request(url,params,page,download_folder)
+        data = get_steamspy_request(url,params,download_folder,page)
         
         if data is None:
             print(f'page {page} is None')
-    
-    end_time = time.time()
-    
-    total_time = end_time - start_time
-    print(f"elapsed time: {total_time}")
+            none_counter = none_counter + 1
+        
+        if none_counter == 5: 
+            print("Finished downloading all steamspy pages")
+            break
 
+    app_list = pd.read_parquet(download_folder)
+    
+    #create app_list for present day
+    date_today = dt.datetime.today().strftime("%Y-%m-%d")
+    app_list_folder = f"{download_folder}/../../app_list"
+    os.makedirs(app_list_folder, exist_ok=True)
+    app_list[['appid','name']].to_parquet(f'{app_list_folder}/app_list_{date_today}.parquet',index=False)
 
 def get_steam_request(appid,name):
     """
@@ -178,7 +177,7 @@ def get_steam_request(appid,name):
         
         print(f'Error {V}: returning name:{name} & steam_appid:{appid}')
         data={'name':name,'steam_appid':appid}
-
+    
     return data 
 
 
@@ -387,7 +386,8 @@ def steamapi_start(folder = "data/steamapi", file_name = 'steamapi'):
     except FileNotFoundError as E:
         print('Start download')
 
+        date_today = dt.datetime.today().strftime("%Y-%m-%d")
         os.makedirs(folder, exist_ok=True)
-        app_list = f'{folder}/../../../app_list.parquet'
+        app_list = f'{folder}/../../app_list/app_list_{date_today}.parquet'
         process_batches(app_list,folder,file_name)
 

@@ -140,8 +140,8 @@ def steamSpy_ETL(steamspy_data_folder):
 
 @flow(name="Main_SteamProject_Local")
 def Main_flow():
-    steamAPI_ETL(steamapi_data_folder="../../sample_resources/steam_proj/data/steamapi")
     steamSpy_ETL(steamspy_data_folder ="../../sample_resources/steam_proj/data/steamSpy")
+    steamAPI_ETL(steamapi_data_folder="../../sample_resources/steam_proj/data/steamapi")
 
 if __name__ == '__main__':
     Main_flow()
