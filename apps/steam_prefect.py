@@ -28,7 +28,7 @@ def get_monday_date_string():
     return monday.strftime("%Y-%m-%d")
 
 
-@task(log_prints=True,retries=3,retry_delay_seconds=600)
+@task(log_prints=True,retries=3,retry_delay_seconds=600,cache_key_fn=task_input_hash, cache_expiration=datetime.timedelta(days=7))
 def UDF_steamAPI_start(folder ,file_name = 'steamapi'):
     """
     FOR STEAMAPI
@@ -91,13 +91,15 @@ def UDF_unnest_data(df_spark):
     
     df_raw = df_spark
     df_price = UDF.steamapi_price_overview(df_spark)
-    df_metacritic = UDF.steamapi_metacritic(df_spark)
+    # df_metacritic = UDF.steamapi_metacritic(df_spark)
     df_categories = UDF.steamapi_categories(df_spark)
     df_genres = UDF.steamapi_genres(df_spark)
 
-    return [df_raw, df_price, df_metacritic, df_categories, df_genres], \
-            ['steamapi_raw','steamapi_price','steamapi_metacritic','steamapi_categories','steamapi_genres']
+    # return [df_raw, df_price, df_metacritic, df_categories, df_genres], \
+    #         ['steamapi_raw','steamapi_price','steamapi_metacritic','steamapi_categories','steamapi_genres']
 
+    return [df_raw, df_price, df_categories, df_genres], \
+        ['steamapi_raw','steamapi_price','steamapi_categories','steamapi_genres']
 
 @task(log_prints=True)
 def load_to_postgres(df_spark,table_name):
