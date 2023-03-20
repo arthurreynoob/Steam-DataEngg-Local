@@ -121,50 +121,9 @@ def load_to_postgres(df_spark,table_name):
 
 
 @flow(name="download_steamWebAPI")
-def steamAPI_ETL(steamapi_data_folder,table_schema):
-    date_name = get_monday_date_string()
-    UDF_steamAPI_start(folder=f"{steamapi_data_folder}/{date_name}")
-    spark = initialize_spark()
-    df_spark = read_data(spark,f"{steamapi_data_folder}/*",table_schema)
-    df_list, table_names = UDF_unnest_data(df_spark)
+def steamAPI_ETL(steamapi_data_folder):
 
-    for i in range(len(df_list)):
-        load_to_postgres(df_list[i],f"{table_names[i]}_{date_name.replace('-','_')}")
-
-
-@flow(name="download_steamSpyAPI")
-def steamSpy_ETL(steamspy_data_folder,table_schema):
-    date_name = datetime.date.today().strftime("%Y-%m-%d")
-    UDF_steamSpy_start(download_folder=f"{steamspy_data_folder}/{date_name}")
-    spark = initialize_spark()
-    df_spark = read_data(spark,f"{steamspy_data_folder}/{date_name}/*",table_schema)
-    load_to_postgres(df_spark,table_name=f"steamspy_All_{date_name.replace('-','_')}")
-
-
-@flow(name="Main_SteamProject_Local")
-def Main_flow():
-    
-    schema_steamspy = StructType([
-    StructField("appid", LongType(), True),
-    StructField("name", StringType(), True),
-    StructField("developer", StringType(), True),
-    StructField("publisher", StringType(), True),
-    StructField("score_rank", StringType(), True),
-    StructField("positive", LongType(), True),
-    StructField("negative", LongType(), True),
-    StructField("userscore", LongType(), True),
-    StructField("owners", StringType(), True),
-    StructField("average_forever", LongType(), True),
-    StructField("average_2weeks", LongType(), True),
-    StructField("median_forever", LongType(), True),
-    StructField("median_2weeks", LongType(), True),
-    StructField("price", StringType(), True),
-    StructField("initialprice", StringType(), True),
-    StructField("discount", StringType(), True),
-    StructField("ccu", LongType(), True)
-        ])
-
-    schema_steamapi = StructType([
+    table_schema = StructType([
     StructField("type", StringType(), True),
     StructField("name", StringType(), True),
     StructField("steam_appid", StringType(), True),
@@ -200,10 +159,55 @@ def Main_flow():
     StructField("price_overview", StringType(), True)
         ])
 
+    date_name = get_monday_date_string()
+    UDF_steamAPI_start(folder=f"{steamapi_data_folder}/{date_name}")
+    spark = initialize_spark()
+    df_spark = read_data(spark,f"{steamapi_data_folder}/*",table_schema)
+    df_list, table_names = UDF_unnest_data(df_spark)
 
-    steamSpy_ETL(steamspy_data_folder ="../resources/data/steamSpy", table_schema = schema_steamspy)
+    for i in range(len(df_list)):
+        load_to_postgres(df_list[i],f"{table_names[i]}_{date_name.replace('-','_')}")
 
-    steamAPI_ETL(steamapi_data_folder="../resources/data/steamapi", table_schema = schema_steamapi)
+
+@flow(name="download_steamSpyAPI")
+def steamSpy_ETL(steamspy_data_folder):
+
+    table_schema = StructType([
+    StructField("appid", LongType(), True),
+    StructField("name", StringType(), True),
+    StructField("developer", StringType(), True),
+    StructField("publisher", StringType(), True),
+    StructField("score_rank", StringType(), True),
+    StructField("positive", LongType(), True),
+    StructField("negative", LongType(), True),
+    StructField("userscore", LongType(), True),
+    StructField("owners", StringType(), True),
+    StructField("average_forever", LongType(), True),
+    StructField("average_2weeks", LongType(), True),
+    StructField("median_forever", LongType(), True),
+    StructField("median_2weeks", LongType(), True),
+    StructField("price", StringType(), True),
+    StructField("initialprice", StringType(), True),
+    StructField("discount", StringType(), True),
+    StructField("ccu", LongType(), True)
+        ])
+
+    date_name = datetime.date.today().strftime("%Y-%m-%d")
+    UDF_steamSpy_start(download_folder=f"{steamspy_data_folder}/{date_name}")
+    spark = initialize_spark()
+    df_spark = read_data(spark,f"{steamspy_data_folder}/{date_name}/*",table_schema)
+    load_to_postgres(df_spark,table_name=f"steamspy_All_{date_name.replace('-','_')}")
+
+
+# @flow(name="Main_SteamProject_Local")
+# def Main_flow():
+
 
 if __name__ == '__main__':
-    Main_flow()
+    
+    steamSpy_ETL(steamspy_data_folder ="../resources/data/steamSpy")
+
+    steamAPI_ETL(steamapi_data_folder="../resources/data/steamapi")
+
+# if __name__ == '__main__':
+#     Main_flow()

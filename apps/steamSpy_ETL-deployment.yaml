@@ -1,0 +1,44 @@
+###
+### A complete description of a Prefect Deployment for flow 'download_steamSpyAPI'
+###
+name: SteamSpy_ETL
+description: null
+version: 0f129717af3cd6bbe10a3e3303d19bae
+# The work queue that will handle this deployment's runs
+work_queue_name: default
+work_pool_name: null
+tags: []
+parameters: {"steamspy_data_folder": "../resources/data/steamSpy"}
+schedule: null
+is_schedule_active: null
+infra_overrides: {}
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: /opt/prefect/apps
+  block_type_slug: process
+  _block_type_slug: process
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: download_steamSpyAPI
+manifest_path: null
+storage: null
+path: /opt/prefect/apps
+entrypoint: steam_prefect.py:steamSpy_ETL
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties:
+    steamspy_data_folder:
+      title: steamspy_data_folder
+      position: 0
+  required:
+  - steamspy_data_folder
+  definitions: null
+timestamp: '2023-03-20T06:19:47.434759+00:00'
