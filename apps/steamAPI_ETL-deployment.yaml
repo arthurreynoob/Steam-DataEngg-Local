@@ -1,0 +1,51 @@
+###
+### A complete description of a Prefect Deployment for flow 'download_steamWebAPI'
+###
+name: steamAPI_ETL
+description: null
+version: 0f129717af3cd6bbe10a3e3303d19bae
+# The work queue that will handle this deployment's runs
+work_queue_name: default
+work_pool_name: default-agent-pool
+tags: []
+parameters:
+  steamapi_data_folder: ../resources/data/steamapi
+schedule:
+  cron: 30 1 * * 1
+  timezone: Asia/Hong_Kong
+  day_or: true
+is_schedule_active: true
+infra_overrides: {}
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: download_steamWebAPI
+manifest_path: null
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: /opt/prefect/apps
+  _block_document_id: 397b387f-8f08-4511-b1e5-9d9e046d93da
+  _block_document_name: anonymous-095c376d-d59a-4d7d-bb1a-7ec2514b0843
+  _is_anonymous: true
+  block_type_slug: process
+  _block_type_slug: process
+storage: null
+path: /opt/prefect/apps
+entrypoint: steam_prefect.py:steamAPI_ETL
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties:
+    steamapi_data_folder:
+      title: steamapi_data_folder
+      position: 0
+  required:
+  - steamapi_data_folder
+  definitions: null
+timestamp: '2023-03-20T07:49:35.311007+00:00'

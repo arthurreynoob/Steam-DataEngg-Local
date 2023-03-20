@@ -1,0 +1,41 @@
+version: '1'
+services:
+  prefect-spark:
+    build: .
+    ports:
+      - "4200:4200"
+      - "4040-4080:4040-4080"
+      - "8888:8888"
+    volumes:
+      - ./apps:/opt/prefect/apps
+      - ./resources:/opt/prefect/resources
+      - ./volumes/prefect:/root/.prefect
+    tty: true
+
+  postgres:
+    image: postgres:13
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data:rw
+      - ./scripts/docker-postgresql-multiple-databases:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root 
+      POSTGRES_MULTIPLE_DATABASES: metabase,test_db,staging_db
+    ports: 
+      - "5432:5432"
+
+  metabase:
+    image: metabase/metabase
+    ports:
+      - 3000:3000
+    volumes:
+      - ./volumes/metabase:/metabase-data
+    tty: true
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: root
+      MB_DB_PASS: root
+      MB_DB_HOST: postgres
+    
