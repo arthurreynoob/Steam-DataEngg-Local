@@ -119,7 +119,7 @@ def steamspy_download_all_page(download_folder="date/steamspy",page_start=0,page
     app_list = pd.read_parquet(download_folder)
     app_list = app_list.sort_values(['appid'],ascending=True)
     
-    #create app_list for present day
+    #create sorted app_list for present day
     date_today = dt.datetime.today().strftime("%Y-%m-%d")
     app_list_folder = f"{download_folder}/../../app_list"
     os.makedirs(app_list_folder, exist_ok=True)
