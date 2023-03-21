@@ -77,6 +77,8 @@ def read_data(spark,data_source,table_schema):
     """
     df_spark = spark.read.schema(table_schema).parquet(data_source,header=True)
 
+    df_spark = df_spark.withColumn("timestamp", F.current_timestamp())
+
     print(f"Total num of records: {df_spark.count()}")
 
     return df_spark
@@ -102,7 +104,7 @@ def UDF_unnest_data(df_spark):
     #     ['steamapi_raw','steamapi_price','steamapi_categories','steamapi_genres']
 
 @task(log_prints=True)
-def load_to_postgres(df_spark,table_name):
+def load_to_postgres(df_spark,table_name,append_table=None):
     """
     loads the dataframe into postgres
     """
@@ -116,6 +118,17 @@ def load_to_postgres(df_spark,table_name):
     .option("password", "root") \
     .mode("overwrite") \
     .save()
+
+    if append_table is not None:
+        df_spark.write \
+        .format("jdbc") \
+        .option("url", "jdbc:postgresql://postgres/test_db") \
+        .option("driver", "org.postgresql.Driver") \
+        .option("dbtable", f"{append_table}_compiled") \
+        .option("user", "root") \
+        .option("password", "root") \
+        .mode("append") \
+        .save()    
 
     return None
 
@@ -166,7 +179,10 @@ def steamAPI_ETL(steamapi_data_folder):
     df_list, table_names = UDF_unnest_data(df_spark)
 
     for i in range(len(df_list)):
-        load_to_postgres(df_list[i],f"{table_names[i]}_{date_name.replace('-','_')}")
+        if "raw" in table_names[i]:
+            load_to_postgres(df_list[i],f"{table_names[i]}_{date_name.replace('-','_')}",append_table="steamapi")
+        else:
+            load_to_postgres(df_list[i],f"{table_names[i]}_{date_name.replace('-','_')}")
 
 
 @flow(name="download_steamSpyAPI")
@@ -196,7 +212,7 @@ def steamSpy_ETL(steamspy_data_folder):
     UDF_steamSpy_start(download_folder=f"{steamspy_data_folder}/{date_name}")
     spark = initialize_spark()
     df_spark = read_data(spark,f"{steamspy_data_folder}/{date_name}/*",table_schema)
-    load_to_postgres(df_spark,table_name=f"steamspy_All_{date_name.replace('-','_')}")
+    load_to_postgres(df_spark,table_name=f"steamspy_All_{date_name.replace('-','_')}",append_table="steamspy")
 
 
 # @flow(name="Main_SteamProject_Local")
